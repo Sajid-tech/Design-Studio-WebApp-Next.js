@@ -1,16 +1,30 @@
 import React from "react";
 import styles from "./page.module.css";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 
-const BlogPost = () => {
+async function getData(id) {
+  const res = await fetch(`https://localhost:3000/api/posts/${id}`, {
+    cache: "no-store",
+  });
+  // The return value is *not* serialized
+  // You can return Date, Map, Set, etc.
+
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    return notFound();
+  }
+
+  return res.json();
+}
+
+const BlogPost = async ({ params }) => {
+  const data = await getData(params.id);
   return (
     <div className={styles.container}>
       <div className={styles.top}>
         <div className={styles.info}>
-          <h1 className={styles.title}>
-            {" "}
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-          </h1>
+          <h1 className={styles.title}>{data.title}</h1>
           <p className={styles.desc}>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque
             aliquam impedit ad et quisquam similique ab molestias nam sed in,

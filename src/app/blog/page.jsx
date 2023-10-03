@@ -3,40 +3,48 @@ import styles from "./page.module.css";
 import Link from "next/link";
 import Image from "next/image";
 
-const Blog = () => {
+// Fetching data on the server with fetch(Server Side)
+
+async function getData() {
+  const res = await fetch("https://localhost:3000/api/posts", {
+    cache: "no-store",
+  });
+  // The return value is *not* serialized
+  // You can return Date, Map, Set, etc.
+
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    throw new Error("Failed to fetch data");
+  }
+
+  return res.json();
+}
+
+const Blog = async () => {
+  let data = await getData();
   return (
     <div className={styles.mainContainer}>
-      <Link href="/blog/testId" className={styles.container}>
-        <div className={styles.imageContainer}>
-          <Image
-            src="https://images.pexels.com/photos/18185921/pexels-photo-18185921/free-photo-of-lifeguard.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            alt=""
-            width={400}
-            height={250}
-            className={styles.image}
-          />
-        </div>
-        <div className={styles.content}>
-          <h1 className={styles.title}>Test</h1>
-          <p className={styles.desc}>Desc</p>
-        </div>
-      </Link>
-      {/* //  */}
-      <Link href="/blog/testId" className={styles.container}>
-        <div className={styles.imageContainer}>
-          <Image
-            src="https://images.pexels.com/photos/18185921/pexels-photo-18185921/free-photo-of-lifeguard.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            alt=""
-            width={400}
-            height={250}
-            className={styles.image}
-          />
-        </div>
-        <div className={styles.content}>
-          <h1 className={styles.title}>Test</h1>
-          <p className={styles.desc}>Desc</p>
-        </div>
-      </Link>
+      {data.map((item) => (
+        <Link
+          href={`/blog/${item_id}`}
+          className={styles.container}
+          key={item.id}
+        >
+          <div className={styles.imageContainer}>
+            <Image
+              src={item.img}
+              alt=""
+              width={400}
+              height={250}
+              className={styles.image}
+            />
+          </div>
+          <div className={styles.content}>
+            <h1 className={styles.title}>{item.title}</h1>
+            <p className={styles.desc}>{item.desc}</p>
+          </div>
+        </Link>
+      ))}
     </div>
   );
 };
